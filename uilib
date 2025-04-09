@@ -1,0 +1,315 @@
+local UILib = {}
+local ScreenGui = Instance.new("ScreenGui")
+local Main = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local LoadingBar = Instance.new("Frame")
+local Bar = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local UICorner_2 = Instance.new("UICorner")
+local LoadingText = Instance.new("TextLabel")
+local PercentageText = Instance.new("TextLabel")
+local DiscordButton = Instance.new("TextButton")
+local UICorner_3 = Instance.new("UICorner")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+function UILib:CreateWindow(title)
+    local ScreenGui = Instance.new("ScreenGui")
+    local Main = Instance.new("Frame")
+    local Title = Instance.new("TextLabel")
+    local TabHolder = Instance.new("Frame")
+    local TabList = Instance.new("UIListLayout")
+    local ContentContainer = Instance.new("Frame")
+    
+    pcall(function()
+        if syn then
+            syn.protect_gui(ScreenGui)
+            ScreenGui.Parent = game.CoreGui
+        elseif gethui then
+            ScreenGui.Parent = gethui()
+        elseif game:GetService("CoreGui") then
+            ScreenGui.Parent = game:GetService("CoreGui")
+        else
+            ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+        end
+    end)
+    
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    
+    Main.Name = "Main"
+    Main.Parent = ScreenGui
+    Main.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    Main.BorderSizePixel = 0
+    Main.Position = UDim2.new(0.5, -250, 0.5, -150)
+    Main.Size = UDim2.new(0, 500, 0, 300)
+    
+    Title.Name = "Title"
+    Title.Parent = Main
+    Title.BackgroundTransparency = 1
+    Title.Size = UDim2.new(1, 0, 0, 30)
+    Title.Font = Enum.Font.SourceSansBold
+    Title.Text = title
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.TextSize = 18
+    
+    TabHolder.Name = "TabHolder"
+    TabHolder.Parent = Main
+    TabHolder.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    TabHolder.BorderSizePixel = 0
+    TabHolder.Position = UDim2.new(0, 0, 0, 30)
+    TabHolder.Size = UDim2.new(0, 120, 1, -30)
+    
+    TabList.Parent = TabHolder
+    TabList.SortOrder = Enum.SortOrder.LayoutOrder
+    
+    ContentContainer.Name = "ContentContainer"
+    ContentContainer.Parent = Main
+    ContentContainer.BackgroundTransparency = 1
+    ContentContainer.Position = UDim2.new(0, 125, 0, 35)
+    ContentContainer.Size = UDim2.new(1, -130, 1, -40)
+    
+    local Window = {}
+    
+    function Window:CreateTab(name)
+        local Tab = Instance.new("TextButton")
+        local TabContent = Instance.new("ScrollingFrame")
+        local ContentList = Instance.new("UIListLayout")
+        
+        Tab.Name = name
+        Tab.Parent = TabHolder
+        Tab.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        Tab.BorderSizePixel = 0
+        Tab.Size = UDim2.new(1, 0, 0, 30)
+        Tab.Font = Enum.Font.SourceSans
+        Tab.Text = name
+        Tab.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Tab.TextSize = 14
+        
+        TabContent.Name = name.."Content"
+        TabContent.Parent = ContentContainer
+        TabContent.BackgroundTransparency = 1
+        TabContent.Size = UDim2.new(1, 0, 1, 0)
+        TabContent.Visible = false
+        TabContent.ScrollBarThickness = 2
+        
+        ContentList.Parent = TabContent
+        ContentList.SortOrder = Enum.SortOrder.LayoutOrder
+        ContentList.Padding = UDim.new(0, 5)
+        
+        local TabFunctions = {}
+        
+        function TabFunctions:CreateButton(text, callback)
+            local Button = Instance.new("TextButton")
+            
+            Button.Name = text
+            Button.Parent = TabContent
+            Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            Button.BorderSizePixel = 0
+            Button.Size = UDim2.new(1, -10, 0, 30)
+            Button.Font = Enum.Font.SourceSans
+            Button.Text = text
+            Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Button.TextSize = 14
+            
+            Button.MouseButton1Click:Connect(callback)
+        end
+        
+        function TabFunctions:CreateToggle(text, default, callback)
+            local Toggle = Instance.new("Frame")
+            local Title = Instance.new("TextLabel")
+            local Button = Instance.new("TextButton")
+            local enabled = default or false
+            
+            Toggle.Name = text
+            Toggle.Parent = TabContent
+            Toggle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            Toggle.BorderSizePixel = 0
+            Toggle.Size = UDim2.new(1, -10, 0, 30)
+            
+            Title.Name = "Title"
+            Title.Parent = Toggle
+            Title.BackgroundTransparency = 1
+            Title.Position = UDim2.new(0, 10, 0, 0)
+            Title.Size = UDim2.new(1, -50, 1, 0)
+            Title.Font = Enum.Font.SourceSans
+            Title.Text = text
+            Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Title.TextSize = 14
+            Title.TextXAlignment = Enum.TextXAlignment.Left
+            
+            Button.Name = "Button"
+            Button.Parent = Toggle
+            Button.BackgroundColor3 = enabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+            Button.BorderSizePixel = 0
+            Button.Position = UDim2.new(1, -35, 0.5, -10)
+            Button.Size = UDim2.new(0, 20, 0, 20)
+            Button.Font = Enum.Font.SourceSans
+            Button.Text = ""
+            
+            Button.MouseButton1Click:Connect(function()
+                enabled = not enabled
+                Button.BackgroundColor3 = enabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+                callback(enabled)
+            end)
+        end
+        
+        function TabFunctions:CreateSlider(text, min, max, default, callback)
+            local Slider = Instance.new("Frame")
+            local Title = Instance.new("TextLabel")
+            local SliderBar = Instance.new("Frame")
+            local Fill = Instance.new("Frame")
+            local Value = Instance.new("TextLabel")
+            
+            Slider.Name = text
+            Slider.Parent = TabContent
+            Slider.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            Slider.BorderSizePixel = 0
+            Slider.Size = UDim2.new(1, -10, 0, 45)
+            
+            Title.Name = "Title"
+            Title.Parent = Slider
+            Title.BackgroundTransparency = 1
+            Title.Position = UDim2.new(0, 10, 0, 0)
+            Title.Size = UDim2.new(1, -20, 0, 20)
+            Title.Font = Enum.Font.SourceSans
+            Title.Text = text
+            Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Title.TextSize = 14
+            Title.TextXAlignment = Enum.TextXAlignment.Left
+            
+            SliderBar.Name = "SliderBar"
+            SliderBar.Parent = Slider
+            SliderBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+            SliderBar.BorderSizePixel = 0
+            SliderBar.Position = UDim2.new(0, 10, 0, 25)
+            SliderBar.Size = UDim2.new(1, -20, 0, 10)
+            
+            Fill.Name = "Fill"
+            Fill.Parent = SliderBar
+            Fill.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            Fill.BorderSizePixel = 0
+            Fill.Size = UDim2.new((default - min)/(max - min), 0, 1, 0)
+            
+            Value.Name = "Value"
+            Value.Parent = Slider
+            Value.BackgroundTransparency = 1
+            Value.Position = UDim2.new(1, -30, 0, 0)
+            Value.Size = UDim2.new(0, 20, 0, 20)
+            Value.Font = Enum.Font.SourceSans
+            Value.Text = tostring(default)
+            Value.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Value.TextSize = 14
+            
+            local dragging = false
+            
+            SliderBar.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = true
+                end
+            end)
+            
+            UserInputService.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = false
+                end
+            end)
+            
+            UserInputService.InputChanged:Connect(function(input)
+                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                    local pos = math.clamp((input.Position.X - SliderBar.AbsolutePosition.X) / SliderBar.AbsoluteSize.X, 0, 1)
+                    local value = math.floor(min + ((max - min) * pos))
+                    Fill.Size = UDim2.new(pos, 0, 1, 0)
+                    Value.Text = tostring(value)
+                    callback(value)
+                end
+            end)
+        end
+        
+        function TabFunctions:CreateColorPicker(text, default, callback)
+            local ColorPicker = Instance.new("Frame")
+            local Title = Instance.new("TextLabel")
+            local Display = Instance.new("TextButton")
+            local Picker = Instance.new("Frame")
+            local Palette = Instance.new("ImageButton")
+            local Cursor = Instance.new("Frame")
+            
+            ColorPicker.Name = text
+            ColorPicker.Parent = TabContent
+            ColorPicker.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            ColorPicker.BorderSizePixel = 0
+            ColorPicker.Size = UDim2.new(1, -10, 0, 30)
+            
+            Title.Name = "Title"
+            Title.Parent = ColorPicker
+            Title.BackgroundTransparency = 1
+            Title.Position = UDim2.new(0, 10, 0, 0)
+            Title.Size = UDim2.new(1, -50, 1, 0)
+            Title.Font = Enum.Font.SourceSans
+            Title.Text = text
+            Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Title.TextSize = 14
+            Title.TextXAlignment = Enum.TextXAlignment.Left
+            
+            Display.Name = "Display"
+            Display.Parent = ColorPicker
+            Display.BackgroundColor3 = default or Color3.fromRGB(255, 255, 255)
+            Display.BorderSizePixel = 0
+            Display.Position = UDim2.new(1, -35, 0.5, -10)
+            Display.Size = UDim2.new(0, 20, 0, 20)
+            Display.Text = ""
+            
+            Picker.Name = "Picker"
+            Picker.Parent = ColorPicker
+            Picker.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            Picker.BorderSizePixel = 0
+            Picker.Position = UDim2.new(0, 0, 1, 5)
+            Picker.Size = UDim2.new(1, 0, 0, 100)
+            Picker.Visible = false
+            Picker.ZIndex = 2
+            
+            Palette.Name = "Palette"
+            Palette.Parent = Picker
+            Palette.BackgroundTransparency = 1
+            Palette.Position = UDim2.new(0, 5, 0, 5)
+            Palette.Size = UDim2.new(1, -10, 1, -10)
+            Palette.Image = "rbxassetid://698052001"
+            Palette.ZIndex = 2
+            
+            Cursor.Name = "Cursor"
+            Cursor.Parent = Palette
+            Cursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            Cursor.BorderSizePixel = 0
+            Cursor.Size = UDim2.new(0, 4, 0, 4)
+            Cursor.ZIndex = 3
+            
+            Display.MouseButton1Click:Connect(function()
+                Picker.Visible = not Picker.Visible
+            end)
+            
+            Palette.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    local color = Color3.fromHSV(
+                        (input.Position.X - Palette.AbsolutePosition.X) / Palette.AbsoluteSize.X,
+                        (input.Position.Y - Palette.AbsolutePosition.Y) / Palette.AbsoluteSize.Y,
+                        1
+                    )
+                    Display.BackgroundColor3 = color
+                    Cursor.Position = UDim2.new(
+                        (input.Position.X - Palette.AbsolutePosition.X) / Palette.AbsoluteSize.X,
+                        0,
+                        (input.Position.Y - Palette.AbsolutePosition.Y) / Palette.AbsoluteSize.Y,
+                        0
+                    )
+                    callback(color)
+                end
+            end)
+        end
+        
+        return TabFunctions
+    end
+    
+    return Window
+end
+
+return UILib
